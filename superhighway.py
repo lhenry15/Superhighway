@@ -25,64 +25,34 @@ def parse_args():
 
 	return parser.parse_args()
 
-def main(args):
-
-	f_src = args.source_data
-	f_tar = args.target_data
-	alpha = float(args.alpha)
-	beta = float(args.beta)
-	odir = args.output
-
-	edgelist = defaultdict(lambda: defaultdict(int))
-
-	# Load Source Data
-	src_user_itemlists = defaultdict(list) 
-	src_item = []
+def LoadEdgelist(f, edgelist, domain):
+	user_itemlists = defaultdict(list)	
+	item = []
 	cnt = 0.0
 	print("Preparing...")
-	src_line = sum(1 for line in open(f_src))
-	with open(f_src, "r") as f:
+	cnt_line = sum(1 for line in open(f))
+	with open(f, "r") as f:
 		for line in f:
 			line = line.strip().split(" ")
-			user = line[0]
-			item = line[1]
+			u = line[0]
+			i = line[1]
 			weight = float(line[2])
-			src_user_itemlists[user].append(item)
-			src_item.append(item)
-			edgelist[user][item] = 1
+			user_itemlists[u].append(i)
+			item.append(i)
+			edgelist[u][i] = 1
 
 			# Print status
-			sys.stdout.write("\rLoading Source Data: " + str(round(cnt/src_line*100, 2)) + " % \r")
+			sys.stdout.write("\rLoading "+domain +" Data: " + str(round(cnt/cnt_line*100, 2)) + " % \r")
 			sys.stdout.flush()
 			cnt += 1
 			#edgelist[user][item] = log(weight)
 	sys.stdout.write("\n")
-	# Load Target Data
-	tar_user_itemlists = defaultdict(list)
-	tar_item = []
-	cnt = 0.0
-	tar_line = sum(1 for line in open(f_tar))
-	with open(f_tar, "r") as f:
-		for line in f:
-			line = line.strip().split(" ")
-			user = line[0]
-			item = line[1]
-			weight = float(line[2])
-			tar_user_itemlists[user].append(item)
-			tar_item.append(item)
-			edgelist[user][item] = 1
 
-			# Print status
-			sys.stdout.write("\rLoading Target Data: " + str(round(cnt/tar_line*100, 2)) + " % \r")
-			sys.stdout.flush()
-			cnt += 1
-			#edgelist[user][item] = log(float(weight))
-	sys.stdout.write("\n")
+	return edgelist, user_itemlists, item
 
-	# information filtering
+def BridgePoint_Identification(src_user_itemlists, tar_user_itemlists, src_item, tar_item, alpha):
 	overlap_item = list(set(src_item)&set(tar_item))
 	selected_src_user = []
-
 	b_cnt = 0.0
 	total = float(len(src_user_itemlists.keys()) + len(tar_user_itemlists.keys()))
 
@@ -100,8 +70,23 @@ def main(args):
 		b_cnt += 1
 		if len(list(set(tar_user_itemlists[tar_user])&set(overlap_item))) > alpha * len(set(tar_user_itemlists[tar_user])):
 			selected_tar_user.append(tar_user)	
-
 	sys.stdout.write("\n")
+
+	return selected_src_user, selected_tar_user
+
+def main(args):
+
+	f_src = args.source_data
+	f_tar = args.target_data
+	alpha = float(args.alpha)
+	beta = float(args.beta)
+	odir = args.output
+
+	edgelist = defaultdict(lambda: defaultdict(int))
+	edgelist, src_user_itemlists, src_item = LoadEdgelist(f_src, edgelist, "Source")
+	edgelist, tar_user_itemlists, tar_item = LoadEdgelist(f_tar, edgelist, "Target")
+	selected_src_user, selected_tar_user = BridgePoint_Identification(src_user_itemlists, tar_user_itemlists, src_item, tar_item, alpha)
+
 	with open(odir,'w') as fw:
 		print("Constructing Highways...")
 		for src in edgelist.keys():
