@@ -17,9 +17,11 @@ def parse_args():
 	parser.add_argument('--target_data', nargs='?', default='data/ml_toy',
 			help='Input Target domain data')
 
-	parser.add_argument('--alpha', type=float, default=0.9)
-	parser.add_argument('--beta', type=float, default=1.0)
-	parser.add_argument('--output', nargs='?', default='output/superhighway.edgelist')
+	parser.add_argument('--alpha', type=float, default=0.9,
+			help='Parameter for filtering user by the ratio of overlapped items in each user\'s accessed item list')
+	parser.add_argument('--beta', type=float, default=1.0,
+			help='Parameter for setting the weight of superhighway')
+	parser.add_argument('--output', nargs='?', default='superhighway.edgelist')
 
 	return parser.parse_args()
 
