@@ -1,6 +1,7 @@
 # Superhighway
 A network construction solution for item-shared cross-domain recommendation.
 # Usage
+```txt
 usage: superhighway.py [-h] [--source_data [SOURCE_DATA]]
                        [--target_data [TARGET_DATA]] [--alpha ALPHA]
                        [--beta BETA] [--output [OUTPUT]]
@@ -16,6 +17,7 @@ optional arguments:
   --alpha ALPHA
   --beta BETA
   --output [OUTPUT]
+```
 
 # Task
 Given two network input:
