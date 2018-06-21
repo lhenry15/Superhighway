@@ -14,8 +14,9 @@ optional arguments:
                         Input source domain data
   --target_data [TARGET_DATA]
                         Input Target domain data
-  --alpha ALPHA
-  --beta BETA
+  --alpha ALPHA         Parameter for filtering user by the ratio of
+                        overlapped items in each user's accessed item list
+  --beta BETA           Parameter for setting the weight of superhighway
   --output [OUTPUT]
 ```
 
